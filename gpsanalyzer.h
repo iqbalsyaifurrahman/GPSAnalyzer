@@ -7,6 +7,7 @@
 #include <QString>
 #include <QtSerialPort>
 
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class GPSAnalyzer;
@@ -27,8 +28,11 @@ private slots:
 private:
     Ui::GPSAnalyzer *ui;
     QSerialPort* COMPORT;
-    QString Data_From_SerialPort;
+    QByteArray data;
+    QByteArray dataBuffer;
     bool IS_Data_Received = false;
+    int k = 0;
+    int row = 1;
 
 };
 #endif // GPSANALYZER_H

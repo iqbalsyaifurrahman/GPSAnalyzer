@@ -1,11 +1,14 @@
 #include "gpsanalyzer.h"
 #include "ui_gpsanalyzer.h"
+#include <iostream>
+#include <string>
 
 GPSAnalyzer::GPSAnalyzer(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::GPSAnalyzer)
 {
-    ui->setupUi(this);
+    ui ->setupUi(this);
+
 
     for (const QSerialPortInfo &portinfor : QSerialPortInfo::availablePorts())
     {
@@ -16,9 +19,13 @@ GPSAnalyzer::GPSAnalyzer(QWidget *parent)
         ui->comboBox->addItem(portinfor.portName());
     }
 
+    QString currentPort = ui ->comboBox ->currentText();
+    QString baudRateText = ui->comboBox_2->currentText();
+    qint32 currentBaudrate = baudRateText.toInt();
+
     COMPORT = new QSerialPort();
-    COMPORT ->setPortName("COM3");
-    COMPORT ->setBaudRate(QSerialPort::BaudRate::Baud4800);
+    COMPORT ->setPortName(currentPort);
+    COMPORT ->setBaudRate(currentBaudrate);
     COMPORT ->setParity(QSerialPort::Parity::NoParity);
     COMPORT ->setDataBits(QSerialPort::DataBits::Data8);
     COMPORT ->setStopBits(QSerialPort::StopBits::OneStop);
@@ -32,7 +39,7 @@ GPSAnalyzer::GPSAnalyzer(QWidget *parent)
         qDebug() << "Serial not connected";
     }
 
-    connect(COMPORT, SIGNAL(readyRead()), this, SLOT((Read_Data())));
+    connect(COMPORT, SIGNAL(readyRead()), this, SLOT(Read_Data()));
 }
 
 GPSAnalyzer::~GPSAnalyzer()
@@ -45,10 +52,26 @@ void GPSAnalyzer::Read_Data()
     if (COMPORT -> isOpen())
     {
         while (COMPORT ->bytesAvailable()){
-            Data_From_SerialPort += COMPORT ->readAll();
-            qDebug() << Data_From_SerialPort;
+            data = COMPORT ->readAll();
+            dataBuffer.append(data);
+            if (data.contains("\n")){
+                QString myString(dataBuffer);
+                ui ->tableWidget -> setRowCount(row);
+                if(myString.startsWith("$GNRMC"))
+                {
+                    QStringList listGNRMC = myString.split(QLatin1Char(','));
+                    // ui -> textEdit ->append(listGNRMC);
+                    qDebug() << listGNRMC;
+
+                    for (int i = 0; i < 13; i++){
+                        ui -> tableWidget ->setItem(k, i, new QTableWidgetItem(listGNRMC[i]));
+                    }
+                    k += 1;
+                    row +=1;
+                }
+                dataBuffer = "";
+            }
+
         }
     }
 }
-
-
