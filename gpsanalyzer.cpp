@@ -8,6 +8,7 @@ GPSAnalyzer::GPSAnalyzer(QWidget *parent)
     , ui(new Ui::GPSAnalyzer)
 {
     ui ->setupUi(this);
+    ui ->tableWidget ->horizontalHeader() ->setSectionResizeMode(QHeaderView::ResizeMode::Stretch);
 
 
     for (const QSerialPortInfo &portinfor : QSerialPortInfo::availablePorts())
@@ -63,7 +64,23 @@ void GPSAnalyzer::Read_Data()
                     // ui -> textEdit ->append(listGNRMC);
                     qDebug() << listGNRMC;
 
-                    for (int i = 0; i < 13; i++){
+                    //
+                    if(listGNRMC[4] == "S")
+                        listGNRMC[3] = "-" + listGNRMC[3];
+                    if(listGNRMC[6] == "W")
+                        listGNRMC[5] = "-" + listGNRMC[6];
+
+                    size_t index = 4; // For example, delete the element at index 2 (3rd element)
+                    auto it = listGNRMC.begin();
+                    std::advance(it, index);
+                    listGNRMC.erase(it);
+
+                    size_t index2 = 6; // For example, delete the element at index 2 (3rd element)
+                    auto it2 = listGNRMC.begin();
+                    std::advance(it2, index2);
+                    listGNRMC.erase(it2);
+
+                    for (int i = 0; i < 11; i++){
                         ui -> tableWidget ->setItem(k, i, new QTableWidgetItem(listGNRMC[i]));
                     }
                     k += 1;
@@ -71,7 +88,6 @@ void GPSAnalyzer::Read_Data()
                 }
                 dataBuffer = "";
             }
-
         }
     }
 }
