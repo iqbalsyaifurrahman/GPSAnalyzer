@@ -77,11 +77,13 @@ void GPSAnalyzer::splitData(QString splitString){
     // ui -> textEdit ->append(listGNRMC);
     // qDebug() << listGNRMC;
 
-    // Date
-    QString date_string = listGNRMC[9] + listGNRMC[1];
-    QDateTime Date = QDateTime::fromString(date_string,"ddMMyy hhmmss.zzz");
-
-    qDebug() << Date.toString("dd/MM/yyyy  HH:mm:ss:zzz") ;
+    // Splitting Date
+    QString date_string = listGNRMC[9]+ " " + listGNRMC[1];
+    // qDebug() << date_string;
+    QDateTime Date = QDateTime::fromString(date_string,"ddMMyy HHmmss.zzz");
+    // qDebug() << Date;
+    Date = Date.addYears(100);
+    // qDebug() << Date.toString("dd-MM-yyyy HH:mm:ss") ;
 
     // Speed knots to Kph
     listGNRMC[7] = QString::number(listGNRMC[7].toFloat() * 1.825);
@@ -91,20 +93,39 @@ void GPSAnalyzer::splitData(QString splitString){
         listGNRMC[3] = "-" + listGNRMC[3];
     if (listGNRMC[6] == "W")
         listGNRMC[5] = "-" + listGNRMC[5];
-    listGNRMC.removeAt(4);
-    listGNRMC.removeAt(6);
+
+    // Remove Format
+    listGNRMC.pop_front();
+    // Remove UTC Time
+    listGNRMC.pop_front();
+    // Remove Latitude Hemisphere
+    listGNRMC.removeAt(2);
+    // Remove Longitude Hemisphere
+    listGNRMC.removeAt(3);
+    // Remove UTC Date
+    listGNRMC.removeAt(5);
+    // Remove XOR Check
+    listGNRMC.removeAt(8);
+
+    //Add timestamp
+    listGNRMC.push_front(Date.toString("dd-MM-yyyy HH:mm:ss"));
+
+    qDebug() << listGNRMC;
 
     writeCSV(listGNRMC);
 
 }
 
 void GPSAnalyzer::writeCSV(QStringList listCSV){
-    QFile CSVFile(QCoreApplication::applicationDirPath() + "/log.csv");
+    QFile CSVFile("C:/Users/Iqbal/OneDrive - UGM 365/Inka/Project GUI GPS/GPSAnalyzer/log.csv");
     if(CSVFile.open(QIODevice::ReadWrite | QIODevice::Append)){
         QTextStream Stream(&CSVFile);
-        for (int i = 1; i < 11; i++){
+        for (int i = 0; i < listCSV.size(); i++){
             ui -> tableWidget ->setItem(k, i, new QTableWidgetItem(listCSV[i]));
-            Stream << listCSV[i] + ",";
+            if (i == listCSV.size()-1)
+                Stream << listCSV[i];
+            else
+                Stream << listCSV[i] << ",";
         }
         Stream << "\r\n";
         k += 1;
