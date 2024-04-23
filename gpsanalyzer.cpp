@@ -89,6 +89,20 @@ void GPSAnalyzer::splitData(QString splitString){
     listGNRMC[7] = QString::number(listGNRMC[7].toFloat() * 1.825);
 
     // Convert Longitude Latitude Hemisphere
+    // var t = "7523.7983" // (DDMM.MMMM)
+    // var g = "03412.9873" //(DDDMM.MMMM)
+
+    // function lat(t){
+    //     return (Number(t.slice(0,2)) + (Number(t.slice(2,9))/60))
+    // }
+
+    // function lng(g) {
+    //     return (Number(g.slice(0,3)) + (Number(g.slice(3,10))/60))
+    // }
+
+    // console.log(lat(t))
+    // console.log(lng(g))
+
     if (listGNRMC[4] == "S")
         listGNRMC[3] = "-" + listGNRMC[3];
     if (listGNRMC[6] == "W")
@@ -117,7 +131,7 @@ void GPSAnalyzer::splitData(QString splitString){
 }
 
 void GPSAnalyzer::writeCSV(QStringList listCSV){
-    QFile CSVFile("C:/Users/Iqbal/OneDrive - UGM 365/Inka/Project GUI GPS/GPSAnalyzer/log.csv");
+    QFile CSVFile("log.csv");
     if(CSVFile.open(QIODevice::ReadWrite | QIODevice::Append)){
         QTextStream Stream(&CSVFile);
         for (int i = 0; i < listCSV.size(); i++){
@@ -129,7 +143,7 @@ void GPSAnalyzer::writeCSV(QStringList listCSV){
         }
         Stream << "\r\n";
         k += 1;
-        row +=1;
+        row += 1;
     }
     CSVFile.close();
 }
