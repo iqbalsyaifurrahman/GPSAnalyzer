@@ -7,6 +7,7 @@
 #include <QString>
 #include <QtSerialPort>
 #include <QDate>
+#include <QDateTime>
 #include <QtCore>
 
 
