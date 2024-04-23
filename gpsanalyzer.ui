@@ -33,11 +33,6 @@
      <widget class="QTableWidget" name="tableWidget">
       <column>
        <property name="text">
-        <string>Format</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
         <string>UTC Time</string>
        </property>
       </column>

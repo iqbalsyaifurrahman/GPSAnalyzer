@@ -6,6 +6,8 @@
 #include <QMessageBox>
 #include <QString>
 #include <QtSerialPort>
+#include <QDate>
+#include <QtCore>
 
 
 QT_BEGIN_NAMESPACE
@@ -23,16 +25,18 @@ public:
     ~GPSAnalyzer();
 
 private slots:
-    void Read_Data();
+    void readData();
+    void splitData(QString splitString);
+    void writeCSV(QStringList listCSV);
 
 private:
     Ui::GPSAnalyzer *ui;
     QSerialPort* COMPORT;
     QByteArray data;
     QByteArray dataBuffer;
-    bool IS_Data_Received = false;
     int k = 0;
     int row = 1;
+
 
 };
 #endif // GPSANALYZER_H
