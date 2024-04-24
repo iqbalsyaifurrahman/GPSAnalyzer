@@ -28,9 +28,11 @@ public:
     ~GPSAnalyzer();
 
 private slots:
+    // void serialPort();
     void readData();
     void splitData(QString splitString);
     void writeCSV(QStringList listCSV);
+    void on_pushButton_clicked();
 
 private:
     Ui::GPSAnalyzer *ui;
@@ -39,6 +41,7 @@ private:
     QByteArray dataBuffer;
     int k = 0;
     int row = 1;
+    bool start = 0;
 
 
 };

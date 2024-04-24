@@ -20,37 +20,13 @@ GPSAnalyzer::GPSAnalyzer(QWidget *parent)
         ui->comboBox->addItem(portinfor.portName());
     }
 
-    // Choosing port and baud by user
-    QString currentPort = ui ->comboBox ->currentText();
-    QString baudRateText = ui->comboBox_2->currentText();
-    qint32 currentBaudrate = baudRateText.toInt();
-
-    // Setting serial port for BN353N
-    COMPORT = new QSerialPort();
-    COMPORT ->setPortName(currentPort);
-    COMPORT ->setBaudRate(currentBaudrate);
-    COMPORT ->setParity(QSerialPort::Parity::NoParity);
-    COMPORT ->setDataBits(QSerialPort::DataBits::Data8);
-    COMPORT ->setStopBits(QSerialPort::StopBits::OneStop);
-    COMPORT ->setFlowControl(QSerialPort::FlowControl::NoFlowControl);
-    COMPORT ->open(QIODevice::ReadWrite);
-
-    if (COMPORT -> isOpen()){
-        qDebug() << "Serial connected";
-    }
-    else {
-        qDebug() << "Serial not connected";
-    }
-
-    // Create signal that serial port is ready to use to readData function
-    connect(COMPORT, SIGNAL(readyRead()), this, SLOT(readData()));
-
 }
 
 GPSAnalyzer::~GPSAnalyzer()
 {
     delete ui;
 }
+
 
 void GPSAnalyzer::readData()
 {
@@ -158,3 +134,45 @@ void GPSAnalyzer::writeCSV(QStringList listCSV){
     }
     CSVFile.close();
 }
+
+void GPSAnalyzer::on_pushButton_clicked()
+{
+    if (start == 0)
+    {
+        start = 1;
+        ui ->pushButton -> setText(QString("Stop"));
+        // Choosing port and baud by user
+        QString currentPort = ui ->comboBox ->currentText();
+        QString baudRateText = ui->comboBox_2->currentText();
+        qint32 currentBaudrate = baudRateText.toInt();
+
+        // Setting serial port for BN353N
+        COMPORT = new QSerialPort();
+        COMPORT ->setPortName(currentPort);
+        COMPORT ->setBaudRate(currentBaudrate);
+        COMPORT ->setParity(QSerialPort::Parity::NoParity);
+        COMPORT ->setDataBits(QSerialPort::DataBits::Data8);
+        COMPORT ->setStopBits(QSerialPort::StopBits::OneStop);
+        COMPORT ->setFlowControl(QSerialPort::FlowControl::NoFlowControl);
+        COMPORT ->open(QIODevice::ReadWrite);
+
+        if (COMPORT -> isOpen()){
+            qDebug() << "Serial connected";
+        }
+        else {
+            qDebug() << "Serial not connected";
+        }
+
+        // Create signal that serial port is ready to use to readData function
+        connect(COMPORT, SIGNAL(readyRead()), this, SLOT(readData()));
+    }
+    else
+    {
+        ui ->pushButton -> setText(QString("Start"));
+        start = 0;
+        COMPORT -> close();
+        if (!(COMPORT -> isOpen()))
+            qDebug() << "Serial closed";
+    }
+}
+
