@@ -25,7 +25,7 @@ GPSAnalyzer::GPSAnalyzer(QWidget *parent)
     QString baudRateText = ui->comboBox_2->currentText();
     qint32 currentBaudrate = baudRateText.toInt();
 
-    // Setting serial port for 353
+    // Setting serial port for BN353N
     COMPORT = new QSerialPort();
     COMPORT ->setPortName(currentPort);
     COMPORT ->setBaudRate(currentBaudrate);
@@ -42,6 +42,7 @@ GPSAnalyzer::GPSAnalyzer(QWidget *parent)
         qDebug() << "Serial not connected";
     }
 
+    // Create signal that serial port is ready to use to readData function
     connect(COMPORT, SIGNAL(readyRead()), this, SLOT(readData()));
 
 }
@@ -62,6 +63,7 @@ void GPSAnalyzer::readData()
                 QString myString(dataBuffer);
                 if(myString.startsWith("$GNRMC"))
                 {
+                    // Call splitData function
                     splitData(myString);
                 }
                 dataBuffer = "";
@@ -71,10 +73,9 @@ void GPSAnalyzer::readData()
 }
 
 void GPSAnalyzer::splitData(QString splitString){
-    ui ->tableWidget -> setRowCount(row);
 
+    // Create list, splitting by ','
     QStringList listGNRMC = splitString.split(QLatin1Char(','));
-    // ui -> textEdit ->append(listGNRMC);
     // qDebug() << listGNRMC;
 
     // Splitting Date
@@ -89,19 +90,20 @@ void GPSAnalyzer::splitData(QString splitString){
     listGNRMC[7] = QString::number(listGNRMC[7].toFloat() * 1.825);
 
     // Convert Longitude Latitude Hemisphere
-    // var t = "7523.7983" // (DDMM.MMMM)
-    // var g = "03412.9873" //(DDDMM.MMMM)
+    // QString latdummy = "0737.0224";
+    // QString longdummy = "11131.4729";
 
-    // function lat(t){
-    //     return (Number(t.slice(0,2)) + (Number(t.slice(2,9))/60))
-    // }
+    // float lati = (latdummy.mid(0,2)).toFloat() + ((latdummy.mid(2,7)).toFloat() / 60);
+    // float longi = (longdummy.mid(0,3)).toFloat() + ((longdummy.mid(3,7)).toFloat() / 60);
 
-    // function lng(g) {
-    //     return (Number(g.slice(0,3)) + (Number(g.slice(3,10))/60))
-    // }
+    float latitude = (listGNRMC[3].mid(0,2)).toFloat() + ((listGNRMC[3].mid(2,7)).toFloat() / 60);
+    float longitude = (listGNRMC[5].mid(0,3)).toFloat() + ((listGNRMC[5].mid(3,7)).toFloat() / 60);
 
-    // console.log(lat(t))
-    // console.log(lng(g))
+    listGNRMC[3] = QString::number(latitude);
+    listGNRMC[5] = QString::number(longitude);
+
+    // qDebug() << listGNRMC[3];
+    // qDebug() << listGNRMC[5];
 
     if (listGNRMC[4] == "S")
         listGNRMC[3] = "-" + listGNRMC[3];
@@ -126,12 +128,19 @@ void GPSAnalyzer::splitData(QString splitString){
 
     qDebug() << listGNRMC;
 
+    // Call writeCSV funtion
     writeCSV(listGNRMC);
 
 }
 
 void GPSAnalyzer::writeCSV(QStringList listCSV){
+    // Set row initiation for tableWidget
+    ui ->tableWidget -> setRowCount(row);
+
+    // Create file "log.csv"
     QFile CSVFile("log.csv");
+
+    // Write and append splitted data to CSV
     if(CSVFile.open(QIODevice::ReadWrite | QIODevice::Append)){
         QTextStream Stream(&CSVFile);
         for (int i = 0; i < listCSV.size(); i++){
@@ -141,6 +150,8 @@ void GPSAnalyzer::writeCSV(QStringList listCSV){
             else
                 Stream << listCSV[i] << ",";
         }
+
+        // Create new row in CSV and table widget
         Stream << "\r\n";
         k += 1;
         row += 1;

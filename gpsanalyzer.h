@@ -9,6 +9,8 @@
 #include <QDate>
 #include <QDateTime>
 #include <QtCore>
+#include <iostream>
+#include <string>
 
 
 QT_BEGIN_NAMESPACE
