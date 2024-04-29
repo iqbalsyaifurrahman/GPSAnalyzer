@@ -36,6 +36,17 @@
       </property>
       <column>
        <property name="text">
+        <string>Date</string>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
         <string>Timestamp</string>
        </property>
        <property name="font">
