@@ -55,11 +55,13 @@ void GPSAnalyzer::splitData(QString splitString){
     // qDebug() << listGNRMC;
 
     // Splitting Date
-    QString date_string = listGNRMC[9]+ " " + listGNRMC[1];
+    QString date_string = listGNRMC[9];
+    QString time_string = listGNRMC[1];
     // qDebug() << date_string;
-    QDateTime Date = QDateTime::fromString(date_string,"ddMMyy HHmmss.zzz");
+    QDateTime temp_date = QDateTime::fromString(date_string,"ddMMyy");
+    QDateTime temp_time = QDateTime::fromString(time_string,"HHmmss.zzz");
     // qDebug() << Date;
-    Date = Date.addYears(100);
+    temp_date = temp_date.addYears(100);
     // qDebug() << Date.toString("dd-MM-yyyy HH:mm:ss") ;
 
     // Speed knots to Kph
@@ -100,7 +102,8 @@ void GPSAnalyzer::splitData(QString splitString){
     listGNRMC.removeAt(8);
 
     //Add timestamp
-    listGNRMC.push_front(Date.toString("dd-MM-yyyy HH:mm:ss"));
+    listGNRMC.push_front(temp_time.toString("HH:mm:ss"));
+    listGNRMC.push_front(temp_date.toString("dd-MM-yyyy"));
 
     qDebug() << listGNRMC;
 
